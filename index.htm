@@ -44,12 +44,19 @@
           <div class="card-body">
             <div class="row">
               <div class="col">
+<<<<<<< Updated upstream
                 <input type="date" id="myDate" value="2022-02-12" onchange="refreshSleep()">
 
                 <select name="user-select" id="user-select" style="width: 150px;" onchange="userSelection()"></select>   
                 </select>                
 <!--                 <input type="text" id="myUserToken" value="" size="38">                      --> 
 
+=======
+                <input v-model="datePickerDate" type="date" id="myDate" value="2022-02-12" v-on:change="newShowSleep()">
+                <select v-model="selectedUser" name="user-select" style="width: 150px;" v-on:change="newShowSleep()">
+                  <option v-for="leader in leaderboard.Leaders" v-bind:value="leader.sessions[0].uuid">{{leader.user.name}}</option>
+                </select>
+>>>>>>> Stashed changes
               </div>
               <div class="col">
               <div class="alert alert-primary" id="status-alert" role="alert">
