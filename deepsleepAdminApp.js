@@ -179,7 +179,7 @@ const deepsleepAdminApp = new Vue({
         eraseCookie("ds_auth");
         location.reload();
       };
-      let result = await makeApiCall("https://sleepnet.appspot.com/api/logout", this.getRequestOptions('DELETE'));
+      let result = await makeApiCall("https://sleepnet.appspot.com/api/logout", this.oldGetRequestOptions('DELETE'));
       callback(result);
     }
   },
