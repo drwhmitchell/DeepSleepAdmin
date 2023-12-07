@@ -10,16 +10,16 @@ var gCharts = [];
 //******************************************************************************************************
 const deepsleepAdminApp = new Vue({
   el: '#deepsleepAdminApp',
-  beforeMount() {
+  mounted() {
     let yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     this.datePickerDate = yesterday.toISOString().split('T')[0];
     if (getCookie('ds_auth')) {
+      console.log('GOT DS AUTH ')
       this.ds_auth = JSON.parse(getCookie('ds_auth'));
       this.prePopulateData();
     }
   },
-  mounted() {},
   data() {
     return {
       // auth credentials
