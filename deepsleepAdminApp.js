@@ -15,7 +15,6 @@ const deepsleepAdminApp = new Vue({
     yesterday.setDate(yesterday.getDate() - 1);
     this.datePickerDate = yesterday.toISOString().split('T')[0];
     if (getCookie('ds_auth')) {
-      console.log('GOT DS AUTH ')
       this.ds_auth = JSON.parse(getCookie('ds_auth'));
       this.prePopulateData();
     }
@@ -27,8 +26,8 @@ const deepsleepAdminApp = new Vue({
       // Login stuff
       login_params: {
         data: {
-          email: null,
-          password: null
+          email: 'will@silvernovus.com',
+          password: 'Covid123'
         },
         remember_me: false,
         show_password: false
@@ -92,6 +91,7 @@ const deepsleepAdminApp = new Vue({
           let matches = this.leaderboard.Leaders.filter(x=>{return x.user.id == this.selectedUser.user.id});
           if(matches && matches.length > 0){
             this.selectedUser = matches[0];
+            console.log('SELECTED USER ', this.selectedUser)
             this.setStatusAlert("Loading data for " + this.selectedUser.user.name + '...')
             this.newShowSleep();
           }
@@ -112,9 +112,32 @@ const deepsleepAdminApp = new Vue({
       if (hypnoMeta) {
         // We only have Healthkit data if there was an AppleWatch detected....but it could be "bad Applewatch data"....
         const heathKitRecs = await this.fetchHealthkitData(dateOffset);
-        drawCharts(hypnoMeta, heathKitRecs);
+        this.convertHypnoDataToLocal(hypnoMeta, heathKitRecs);
         this.setStatusAlert('Showing data for ' + this.selectedUser.user.name)
       }
+    },
+    convertHypnoDataToLocal(hypnoMeta, heathKitRecs){
+      let localOffsetMins = new Date().getTimezoneOffset();
+      if(hypnoMeta && hypnoMeta.length > 0){
+        hypnoMeta.forEach(x=>{
+          let datasetOffsetMins = x.utcoffset/60000;
+          let offsetDeltaMins = localOffsetMins + datasetOffsetMins;
+          let deltaOffsetMs = offsetDeltaMins * 60000;
+          let hypno = JSON.parse(x.hypno);
+          hypno.forEach(el=>{
+            if(el.y){
+              if(el.y[0]){
+                el.y[0] += deltaOffsetMs;
+              }
+              if(el.y[1]){
+                el.y[0] += deltaOffsetMs;
+              }
+            }
+          });
+          x.hypno = JSON.stringify(hypno);
+        })
+      }
+      drawCharts(hypnoMeta, heathKitRecs);
     },
     // API CALLS
     async fetchLeaderboard(dateOffset) {
@@ -315,7 +338,6 @@ function getDateOffset(date) {
 function marshallSleepNetHypno(hypno) {
   const hypnoState = ["Catatonic", "Deep", "Light", "REM", "Wake"];
   var newHypno = [];
-
   hypno.forEach((el, i) => {
     newHypno.push({
       x: el.y[0],
@@ -335,7 +357,6 @@ function marshallSleepNetHypno(hypno) {
     x: new Date(hypno[hypno.length - 1].y[1]).toLocaleString(),
     y: hypnoState.indexOf(hypno[hypno.length - 1].x)
   });
-  console.log("NEW HYPNO =: " + JSON.stringify(newHypno));
   return (newHypno);
 }
 
@@ -404,6 +425,7 @@ function xformAERecs(recList) {
 }
 
 function findExtents(jsonHypno, isAppleWatchValid) {
+
   let min = Date.now();
   let max = 0;
   const padding = 600000;
