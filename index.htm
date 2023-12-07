@@ -27,20 +27,27 @@
         <br>
         <div class="card">
           <div class="card-body">
-            <div class="row">
-              <div class="col">
-                <input v-model="datePickerDate" type="date" id="myDate" value="2022-02-12" v-on:change="newShowSleep()">
-                <select v-model="selectedUser" name="user-select" style="width: 150px;" v-on:change="newShowSleep()">
-                  <option v-for="leader in leaderboard.Leaders" v-bind:value="leader.sessions[0].uuid">{{leader.user.name}}</option>
+            <div class="row" style="display: flex; flex-direction: row; align-items: center;">
+              <div class="col-sm-6 col-md-2" style="padding-top: 5px;">
+                <input v-model="datePickerDate" class="form-control" type="date" id="myDate" value="2022-02-12" v-on:change="changeDate()">
+              </div>
+              <div class="col-sm-6 col-md-2" style="padding-top: 5px;">
+                <select v-model="selectedUser" name="user-select" class="form-control"  v-on:change="newShowSleep()">
+                  <!-- <option v-for="leader in leaderboard.Leaders" v-bind:value="leader.sessions[0].uuid">{{leader.user.name}}</option> -->
+                  <option v-for="leader in leaderboard.Leaders" v-bind:value="leader" v-bind:disabled="!(leader.sessions && leader.sessions.length > 0)">
+                    {{leader.user.name}} {{!(leader.sessions && leader.sessions.length > 0) ? ' (No Sessions found) ' : ''}}
+                  </option>
                 </select>
               </div>
-              <div class="col">
+              <div class="col-sm-12 col-md-5" style="padding-top: 5px;">
                 <div class="alert alert-primary" v-if="alert && alert.message" role="alert">{{alert.message}}</div>
               </div>
-              <div class="col">
+              <div class="col-sm-12 col-md-3">
                 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                   <span id="currentUserBadge" style="flex:1;" v-if="ds_auth">
-                    Logged in as {{ds_auth.user.email}}
+                    Logged in as 
+                    <br>
+                    {{ds_auth.user.email}}
                   </span>
                   <button type="button" style="flex:1;" class="btn btn-danger" v-on:click="logout()">Logout</button>
                 </div>

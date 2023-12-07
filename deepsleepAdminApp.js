@@ -27,8 +27,8 @@ const deepsleepAdminApp = new Vue({
       // Login stuff
       login_params: {
         data: {
-          email: null,
-          password: null
+          email: 'will@silvernovus.com',
+          password: 'Covid123'
         },
         remember_me: false,
         show_password: false
@@ -54,6 +54,7 @@ const deepsleepAdminApp = new Vue({
         if (!this.leaderboard.Leaders) {
           this.leaderboard.Leaders = [];
         }
+        console.log(this.leaderboard.Leaders)
         this.setStatusAlert('Loaded ' + this.leaderboard.Leaders.length + " customers.");
       } else {
         this.setErrorAlert("Error:  No DeepSleep Users Found!");
@@ -62,7 +63,7 @@ const deepsleepAdminApp = new Vue({
     // HELPERS
     getRequestOptions(requestType) {
       var headers = new Headers();
-      headers.append("Authorization", "Bearer " + this.selectedUser);
+      headers.append("Authorization", "Bearer " + this.selectedUser.sessions[0].uuid);
       return {
         method: requestType,
         headers: headers,
@@ -84,6 +85,26 @@ const deepsleepAdminApp = new Vue({
       dateDelta = getDateOffset(this.datePickerDate);
       this.mainProgram(dateDelta);
     },
+    async changeDate(){
+      await this.prePopulateData();
+      if(this.leaderboard.Leaders && this.leaderboard.Leaders.length > 0){
+        if(this.selectedUser){
+          let matches = this.leaderboard.Leaders.filter(x=>{return x.user.id == this.selectedUser.user.id});
+          if(matches && matches.length > 0){
+            this.selectedUser = matches[0];
+            this.setStatusAlert("Loading data for " + this.selectedUser.user.name + '...')
+            this.newShowSleep();
+          }
+          else{
+            cleanUpAllCharts();
+          }
+        }
+      }
+      else{
+        cleanUpAllCharts();
+      }
+      
+    },
     async mainProgram(dateOffset) {
       // Try to grab the union of all Hypno data we have for the user
       const hypnoMeta = await this.fetchHypnoData(dateOffset);
@@ -92,6 +113,7 @@ const deepsleepAdminApp = new Vue({
         // We only have Healthkit data if there was an AppleWatch detected....but it could be "bad Applewatch data"....
         const heathKitRecs = await this.fetchHealthkitData(dateOffset);
         drawCharts(hypnoMeta, heathKitRecs);
+        this.setStatusAlert('Showing data for ' + this.selectedUser.user.name)
       }
     },
     // API CALLS
