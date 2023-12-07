@@ -27,8 +27,8 @@ const deepsleepAdminApp = new Vue({
       // Login stuff
       login_params: {
         data: {
-          email: 'will@silvernovus.com',
-          password: 'Covid123'
+          email: null,
+          password: null
         },
         remember_me: false,
         show_password: false
