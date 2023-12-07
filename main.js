@@ -11,6 +11,12 @@
 
 // gCharts keeps track of the list of charts created so we can destroy them 
 
+
+// VUE APP 
+
+
+
+
 const gChartDiv = "chart-area";
 var gDST = "";    // A global for the bearer token .....hack hack!!!
 var gChartCount = 1;
@@ -723,6 +729,7 @@ function difference(d1, d2) {
     day = 1000*60*60*24;
   return(date2utc - date1utc)/day
 }
+
 
 
 
