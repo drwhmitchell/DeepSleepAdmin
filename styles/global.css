@@ -8,3 +8,4 @@
     width: 120px;
     margin-bottom: 40px;
   }
+  [v-cloak] { display: none; }
